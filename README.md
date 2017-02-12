@@ -153,5 +153,26 @@ Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Vo
 
 
 
-# Volley源码分析 #
-[阅读源码的总结](http://www.jianshu.com/p/be86e5678252)
+# Volley的源码分析 #
+## 不要纠结细节，看主要逻辑和框架 ##
+[如何阅读源码](http://www.jianshu.com/p/be86e5678252)
+
+[源码分析大全](http://www.codekk.com/open-source-project-analysis)
+
+## 请求队列的初始化 ##
+1. 磁盘缓存的初始化（DiskBasedCache）mCache
+2. 执行网络请求对象（Network）的创建 mNetwork
+3. 初始化网络请求的线程池mDispatchers = new NetworkDispatcher[threadPoolSize];，默认大小是4.
+4. 创建网络请求响应和错误的分发器mDelivery=new ExecutorDelivery(new Handler(Looper.getMainLooper()))
+
+## 请求队列的启动 ##
+1. 创建缓存分发器mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);启动该线程，执行run方法，run方法里面初始化磁盘缓存（把缓存文件的头读取出来，存入集合）
+2. 创建网络分发器并且启动
+```NetworkDispatcher networkDispatcher 
+   = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
+   mDispatchers[i] = networkDispatcher;
+```
+## 发送请求 ##
+1. 首先网络请求添加到缓存请求队列mCacheQueue，CacheDispatcher的run方法里面的监控mCacheQueue，如果mCacheQueue有请求，则拿出来，查看是否有缓存，如果有并且没有过期，则解析网络缓存的结果，分发到主线程
+2. 请求加入到网络请求队列mNetworkQueue,NetworkDispatcher的run方法里面监控mNetworkQueue,如果有请求，则拿出来发送网络请求，获取到结果后解析，然后存入缓存，最后分发到主线程。
+
