@@ -136,6 +136,57 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 	    }
 	}
 
+## 9. NetworkImageView的使用 ##
+### 设置网络图片 ###
+    mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
+    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);//设置默认图片
+    String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
+    mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+
+### ImageLoader的封装 ###
+ImageLoader是加载和缓存网络图片的工具。由于它也要用到RequestQueue, 一个应用也只需要一个ImageLoader,所以同样的封装到NetworkManager中。
+
+    public void init(Context context) {
+        mQueue = Volley.newRequestQueue(context);
+        mImageLoader = new ImageLoader(mQueue, new ImageLruCache(DEFAULT_IMAGE_CACHE_SIZE));
+    }
+
+
+    /**
+     * 图片内存LRU缓存
+     */
+    private static class ImageLruCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache{
+
+
+        public ImageLruCache(int maxSize) {
+            super(maxSize);
+        }
+
+        /**
+         * 返回对应key的bitmap的大小，当存入缓存时，要计算是否超出缓存的最大值
+         */
+        @Override
+        protected int sizeOf(String key, Bitmap value) {
+            return value.getByteCount();
+        }
+
+        /**
+         * 返回对应url的图片缓存
+         */
+        @Override
+        public Bitmap getBitmap(String url) {
+            return get(url);
+        }
+
+        /**
+         * 存入缓存
+         */
+        @Override
+        public void putBitmap(String url, Bitmap bitmap) {
+            put(url, bitmap);
+        }
+    }
+
 # Volley的封装层级 #
 Volley的封装级别类似Retrofit，[FunHttp](https://github.com/uncleleonfan/FunHttp)。 Retrofit，FunHttp都是对OKhttp的一层封装，解决了数据转换和线程切换等问题。
 Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Volley的良好扩展性，还可以配置使用Okhttp进行网络请求。
@@ -172,7 +223,9 @@ Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Vo
    = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
    mDispatchers[i] = networkDispatcher;
 ```
+
 ## 发送请求 ##
+
 1. 首先网络请求添加到缓存请求队列mCacheQueue，CacheDispatcher的run方法里面的监控mCacheQueue，如果mCacheQueue有请求，则拿出来，查看是否有缓存，如果有并且没有过期，则解析网络缓存的结果，分发到主线程
 2. 请求加入到网络请求队列mNetworkQueue,NetworkDispatcher的run方法里面监控mNetworkQueue,如果有请求，则拿出来发送网络请求，获取到结果后解析，然后存入缓存，最后分发到主线程。
 

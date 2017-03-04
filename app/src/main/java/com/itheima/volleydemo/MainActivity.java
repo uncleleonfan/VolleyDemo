@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
         mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);
         String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
+        mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
     }
 
     public void onStartStringRequest(View view) {
@@ -119,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStartImageRequest(View view) {
         String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
         //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，则会对图片进行压缩，
-        // 指定成0的话就表示不管图片有多大，都不会进行压缩。第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片
-        // 的宽度或高度大于这里的最大值，则会对图片进行压缩，指定成0的话就表示不管图片有多大，都不会进行压缩。
+        // 指定成0的话就表示不管图片有多大，都不会进行压缩。
         ImageRequest request = new ImageRequest(url, mBitmapListener, 0, 0, Bitmap.Config.RGB_565, mErrorListener);
         Volley.newRequestQueue(this).add(request);
     }
