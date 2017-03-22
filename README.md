@@ -217,12 +217,21 @@ Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Vo
 4. 创建网络请求响应和错误的分发器mDelivery=new ExecutorDelivery(new Handler(Looper.getMainLooper()))
 
 ## 请求队列的启动 ##
-1. 创建缓存分发器mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);启动该线程，执行run方法，run方法里面初始化磁盘缓存（把缓存文件的头读取出来，存入集合）
+1. 创建缓存分发器，启动该线程，执行run方法，run方法里面初始化磁盘缓存（把缓存文件的头读取出来，存入集合）
+	    
+		mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
+        mCacheDispatcher.start();
+
+
 2. 创建网络分发器并且启动
-```NetworkDispatcher networkDispatcher 
-   = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
-   mDispatchers[i] = networkDispatcher;
-```
+
+        // Create network dispatchers (and corresponding threads) up to the pool size.
+        for (int i = 0; i < mDispatchers.length; i++) {
+            NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork,
+                    mCache, mDelivery);
+            mDispatchers[i] = networkDispatcher;
+            networkDispatcher.start();
+        }
 
 ## 发送请求 ##
 
