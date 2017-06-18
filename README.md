@@ -8,6 +8,20 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 * 缓存
 * 取消请求
 
+# Volley工作流程 #
+![icon](img/volley-request.png)
+
+1. 线程管理
+2. 缓存的管理
+3. 发送网络请求过程
+	1. 在主线程把请求加入请求队列
+	2. 缓存线程查询请求是否有缓存，如果有缓存，则从缓存中获取数据解析返回给主线程，如果没有缓存，把请求分发给网络线程
+	3. 网络线程发送请求，从服务器获取数据，解析后返回给主线程
+
+
+
+# Volley的源码分析 #
+
 # Volley使用 #
 * [Github](https://github.com/mcxiaoke/android-volley)
 * [基本用法](http://blog.csdn.net/guolin_blog/article/details/17482095)
@@ -192,19 +206,6 @@ Volley的封装级别类似Retrofit，[FunHttp](https://github.com/uncleleonfan/
 Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Volley的良好扩展性，还可以配置使用Okhttp进行网络请求。
 可以看出HttpClient，HttpURLConnection，Okhttp属于同一层级，Retrofit，Volley，FunHttp属于同一层级。
 
-# Volley工作流程 #
-![icon](img/volley-request.png)
-
-1. 线程管理
-2. 缓存的管理
-3. 发送网络请求过程
-	1. 在主线程把请求加入请求队列
-	2. 缓存线程查询请求是否有缓存，如果有缓存，则从缓存中获取数据解析返回给主线程，如果没有缓存，把请求分发给网络线程
-	3. 网络线程发送请求，从服务器获取数据，解析后返回给主线程
-
-
-
-# Volley的源码分析 #
 ## 不要纠结细节，看主要逻辑和框架 ##
 [如何阅读源码](http://www.jianshu.com/p/be86e5678252)
 
