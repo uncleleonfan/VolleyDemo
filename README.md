@@ -20,8 +20,6 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 
 
 
-# Volley的源码分析 #
-
 # Volley使用 #
 * [Github](https://github.com/mcxiaoke/android-volley)
 * [基本用法](http://blog.csdn.net/guolin_blog/article/details/17482095)
@@ -205,6 +203,10 @@ ImageLoader是加载和缓存网络图片的工具。由于它也要用到Reques
 Volley的封装级别类似Retrofit，[FunHttp](https://github.com/uncleleonfan/FunHttp)。 Retrofit，FunHttp都是对OKhttp的一层封装，解决了数据转换和线程切换等问题。
 Volley内部使用HttpClient或者HttpURLConnection完成网络请求，由于Volley的良好扩展性，还可以配置使用Okhttp进行网络请求。
 可以看出HttpClient，HttpURLConnection，Okhttp属于同一层级，Retrofit，Volley，FunHttp属于同一层级。
+
+
+
+# Volley的源码分析 #
 
 ## 不要纠结细节，看主要逻辑和框架 ##
 [如何阅读源码](http://www.jianshu.com/p/be86e5678252)
