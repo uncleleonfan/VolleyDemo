@@ -37,6 +37,20 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
         Volley.newRequestQueue(this).add(stringRequest);
 
     }
+
+    private Response.Listener<String> mStringListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private Response.ErrorListener mErrorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(MainActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    };
 ## 4. JsonObject请求 ##
     public void onStartJsonObjectRequest(View view) {
         String url = "http://gank.io/api/data/Android/10/1";
@@ -46,12 +60,40 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
         Volley.newRequestQueue(this).add(jsonObjectRequest);
 
     }
+
+    private Response.Listener<JSONObject> mJSONObjectListener = new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            try {
+                //获取网络响应中results数组中第一个元素的"desc"字段
+                String desc = response.getJSONArray("results").getJSONObject(0).getString("desc");
+                Toast.makeText(MainActivity.this, desc, Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
 ## 5. JsonArray请求 ##
     public void onStartJsonArrayRequest(View view) {
         String url = "https://api.github.com/users/octocat/repos";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, mJSONArrayListener, mErrorListener);
         Volley.newRequestQueue(this).add(jsonArrayRequest);
     }
+
+    private Response.Listener<JSONArray> mJSONArrayListener = new Response.Listener<JSONArray>() {
+
+        @Override
+        public void onResponse(JSONArray response) {
+            try {
+                //获取数组中第一个元素的"name"字段
+                String name = response.getJSONObject(0).getString("name");
+                Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
 
 
@@ -69,6 +111,12 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
         Volley.newRequestQueue(this).add(request);
     }
 
+    private Response.Listener<Bitmap> mBitmapListener = new Response.Listener<Bitmap>() {
+        @Override
+        public void onResponse(Bitmap response) {
+            mImageView.setImageBitmap(response);
+        }
+    };
 
 # Volley的封装 #
 
