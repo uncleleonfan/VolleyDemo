@@ -34,12 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
         mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
         mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);
-        String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
+        String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
         mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
     }
 
+    //发送一个StringRequest
     public void onStartStringRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
+        String url = "http://gank.io/api/data/Android/10/1";
         StringRequest stringRequest = new StringRequest(url, mStringListener, mErrorListener);
 //        Volley.newRequestQueue(this).add(stringRequest);
         NetworkManager.getInstance().sendRequest(stringRequest);
@@ -59,14 +60,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //发送一个JsonObjectRequest
     public void onStartJsonObjectRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
+        String url = "http://gank.io/api/data/Android/10/1";
         //Get请求第二个参数传null
         //Post请求第二个参数传JsonObject对象
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null, mJSONObjectListener, mErrorListener);
-        Volley.newRequestQueue(this).add(jsonObjectRequest);
+//        Volley.newRequestQueue(this).add(jsonObjectRequest);
+        NetworkManager.getInstance().sendRequest(jsonObjectRequest);
     }
-    
+
+    //获取一个json对象
     private Response.Listener<JSONObject> mJSONObjectListener = new Response.Listener<JSONObject>() {
         /**
          *
@@ -75,50 +79,56 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResponse(JSONObject response) {
             try {
-                //image/home01.jpg
-                Toast.makeText(MainActivity.this, response.getJSONArray("picture").getString(0), Toast.LENGTH_SHORT).show();
+                //获取网络响应中results数组中第一个元素的"desc"字段
+                String desc = response.getJSONArray("results").getJSONObject(0).getString("desc");
+                Toast.makeText(MainActivity.this, desc, Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     };
 
+    //发送JsonArrayRequest请求获取一个json数组
     public void onStartJsonArrayRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/app?index=0";
+        String url = "https://api.github.com/users/octocat/repos";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, mJSONArrayListener, mErrorListener);
-        Volley.newRequestQueue(this).add(jsonArrayRequest);
+//        Volley.newRequestQueue(this).add(jsonArrayRequest);
+        NetworkManager.getInstance().sendRequest(jsonArrayRequest);
     }
 
     private Response.Listener<JSONArray> mJSONArrayListener = new Response.Listener<JSONArray>() {
-        /**
-         * [{"id":1580615,"name":"人人","packageName":"com.renren.mobile.android","iconUrl":"app/com.renren.mobile.android/icon.jpg","stars":2,"size":21803987,"downloadUrl":"app/com.renren.mobile.android/com.renren.mobile.android.apk","des":"2005-2014你的校园一直在这儿。中国最大的实名制SNS网络平台，大学生"}]
-         */
+
         @Override
         public void onResponse(JSONArray response) {
             try {
-                //1580615
-                Toast.makeText(MainActivity.this, response.getJSONObject(0).getString("id"), Toast.LENGTH_SHORT).show();
+                //获取数组中第一个元素的"name"字段
+                String name = response.getJSONObject(0).getString("name");
+                Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     };
 
+    //使用自定义请求获取网络结果解析成一个Bean对象
     public void onStartGsonRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
-        GsonRequest<HomeBean> request = new GsonRequest<HomeBean>(url, HomeBean.class, mHomeBeanListener, mErrorListener);
-        Volley.newRequestQueue(MainActivity.this).add(request);
+        String url = "http://gank.io/api/data/Android/10/1";
+        GsonRequest<GankBean> request = new GsonRequest<GankBean>(url, GankBean.class, mGankBeanListener, mErrorListener);
+//        Volley.newRequestQueue(MainActivity.this).add(request);
+        NetworkManager.getInstance().sendRequest(request);
     }
 
-    private Response.Listener<HomeBean> mHomeBeanListener = new Response.Listener<HomeBean>() {
+    private Response.Listener<GankBean> mGankBeanListener = new Response.Listener<GankBean>() {
         @Override
-        public void onResponse(HomeBean response) {
-            Toast.makeText(MainActivity.this, response.getPicture().get(0), Toast.LENGTH_SHORT).show();
+        public void onResponse(GankBean response) {
+            //获取网络响应中results数组中第一个元素的"desc"字段
+            String desc = response.getResults().get(0).getDesc();
+            Toast.makeText(MainActivity.this, desc, Toast.LENGTH_SHORT).show();
         }
     };
 
     public void onStartImageRequest(View view) {
-        String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
+        String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
         //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，则会对图片进行压缩，
         // 指定成0的话就表示不管图片有多大，都不会进行压缩。
         ImageRequest request = new ImageRequest(url, mBitmapListener, 0, 0, Bitmap.Config.RGB_565, mErrorListener);

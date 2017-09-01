@@ -40,16 +40,38 @@
             android:text="图片请求"
             android:onClick="onStartImageRequest"/>
 
-
-        <ImageView
-            android:id="@+id/image_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"/>
+            android:layout_height="300dp">
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/network_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
 
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/network_image_view"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NetworkImageImageView"
+                android:padding="8dp"/>
+
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"/>
+            android:layout_height="300dp"
+            android:layout_marginTop="8dp">
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ImageView"
+                android:padding="8dp"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 
