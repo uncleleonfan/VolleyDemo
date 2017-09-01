@@ -113,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
     //使用自定义请求获取网络结果解析成一个Bean对象
     public void onStartGsonRequest(View view) {
         String url = "http://gank.io/api/data/Android/10/1";
-        GsonRequest<GankBean> request = new GsonRequest<GankBean>(url, GankBean.class, mGankBeanListener, mErrorListener);
+        GsonRequest<GankBean> request = new GsonRequest<GankBean>(GankBean.class, url, mGankBeanNetworkListener);
 //        Volley.newRequestQueue(MainActivity.this).add(request);
         NetworkManager.getInstance().sendRequest(request);
     }
 
-    private Response.Listener<GankBean> mGankBeanListener = new Response.Listener<GankBean>() {
+    private NetworkListener<GankBean> mGankBeanNetworkListener = new NetworkListener<GankBean>() {
         @Override
         public void onResponse(GankBean response) {
             //获取网络响应中results数组中第一个元素的"desc"字段
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, desc, Toast.LENGTH_SHORT).show();
         }
     };
+
 
     public void onStartImageRequest(View view) {
         String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";

@@ -32,84 +32,30 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
     compile 'com.android.volley:volley:1.0.0'
 ## 3. 字符串请求 ##
     public void onStartStringRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
+        String url = "http://gank.io/api/data/Android/10/1";
         StringRequest stringRequest = new StringRequest(url, mStringListener, mErrorListener);
         Volley.newRequestQueue(this).add(stringRequest);
+
     }
 ## 4. JsonObject请求 ##
     public void onStartJsonObjectRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
+        String url = "http://gank.io/api/data/Android/10/1";
         //Get请求第二个参数传null
         //Post请求第二个参数传JsonObject对象
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null, mJSONObjectListener, mErrorListener);
         Volley.newRequestQueue(this).add(jsonObjectRequest);
+
     }
 ## 5. JsonArray请求 ##
     public void onStartJsonArrayRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/app?index=0";
+        String url = "https://api.github.com/users/octocat/repos";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, mJSONArrayListener, mErrorListener);
         Volley.newRequestQueue(this).add(jsonArrayRequest);
     }
 
-## 6. 自定义Gson请求 ##
-
-### 添加Gson依赖 ###
-    compile 'com.google.code.gson:gson:2.8.0'
-### 创建Gson请求 ###
-	
-	public class GsonRequest<T> extends Request<T> {
-	
-	    private final Response.Listener<T> mListener;
-	
-	    private Gson mGson = new Gson();
-	
-	    private Class<T> mClass;//要解析的类的类对象
-	
-	    public GsonRequest(String url, Class classz,  Response.Listener<T> listener, Response.ErrorListener errorListener) {
-	        this(Method.GET, url, classz, listener, errorListener);
-	    }
-	
-	    public GsonRequest(int method, String url, Class classz, Response.Listener<T> listener, Response.ErrorListener errorListener) {
-	        super(method, url, errorListener);
-	        mListener = listener;
-	        mClass = classz;
-	    }
-	
-	    /**
-	     * 将网络请求的结果用Gson解析成期望的类型，在子线程中调用
-	     */
-	    @Override
-	    protected Response<T> parseNetworkResponse(NetworkResponse response) {
-	        String parsedString;
-	        try {
-	            parsedString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-	        } catch (UnsupportedEncodingException e) {
-	            parsedString = new String(response.data);
-	        }
-	        Log.d(TAG, "parsedString: " + parsedString);
-	        T result = mGson.fromJson(parsedString, mClass);
-	        return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
-	    }
-	
-	    /**
-	     * 分发解析后的结果，在主线程中调用
-	     */
-	    @Override
-	    protected void deliverResponse(T response) {
-	        mListener.onResponse(response);
-	    }
-	}
 
 
-### 发送请求 ###
-    public void onStartGsonRequest(View view) {
-        String url = "http://10.0.2.2:8080/GooglePlayServer/home?index=0";
-        GsonRequest<HomeBean> request = new GsonRequest<HomeBean>(url, HomeBean.class, mHomeBeanListener, mErrorListener);
-        Volley.newRequestQueue(MainActivity.this).add(request);
-    }
-
-
-## 7. 图片请求 ##
+## 6. 图片请求 ##
     public void onStartImageRequest(View view) {
         String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
         //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，则会对图片进行压缩，
@@ -119,7 +65,9 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
         Volley.newRequestQueue(this).add(request);
     }
 
-## 8. 请求队列的封装 ##
+# Volley的封装 #
+
+## 1. 请求队列的封装 ##
 一个应用只需一个RequestQueue, 不必每次发请求都创建一个请求队列。
 
 	public class NetworkManager {
@@ -148,14 +96,66 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 	    }
 	}
 
-## 9. NetworkImageView的使用 ##
-### 设置网络图片 ###
-    mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
-    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);//设置默认图片
-    String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
-    mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+## 2. 回调的封装 ##
+	public class NetworkListener<T> implements Response.Listener<T>, Response.ErrorListener{
+	    @Override
+	    public void onErrorResponse(VolleyError error) {
+	
+	    }
+	
+	    @Override
+	    public void onResponse(T response) {
+	
+	    }
+	}
 
-### ImageLoader的封装 ###
+## 3. 自定义Gson请求 ##
+
+### 添加Gson依赖 ###
+    compile 'com.google.code.gson:gson:2.8.0'
+### 创建Gson请求 ###
+	
+	public class GsonRequest<T> extends JsonRequest<T> {
+	    
+	    private Gson mGson = new Gson();
+	
+	    private Class<T> mClass;//要解析的类的类对象
+	    
+	    public GsonRequest(int method, String url, String requestBody, Response.Listener<T> listener, Response.ErrorListener errorListener) {
+	        super(method, url, requestBody, listener, errorListener);
+	    }
+	
+	    public GsonRequest(Class<T> beanClass, String url, NetworkListener<T> listener) {
+	        this(Method.GET, url, null, listener, listener);
+	        mClass = beanClass;
+	    }
+	
+	    /**
+	     * 将网络请求的结果用Gson解析成期望的类型，在子线程中调用
+	     */
+	    @Override
+	    protected Response<T> parseNetworkResponse(NetworkResponse response) {
+	        String parsedString;
+	        try {
+	            parsedString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+	        } catch (UnsupportedEncodingException e) {
+	            parsedString = new String(response.data);
+	        }
+	        Log.d(TAG, "parsedString: " + parsedString);
+	        T result = mGson.fromJson(parsedString, mClass);
+	        return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
+	    }
+	}
+
+
+### 发送请求 ###
+    public void onStartGsonRequest(View view) {
+        String url = "http://gank.io/api/data/Android/10/1";
+        GsonRequest<GankBean> request = new GsonRequest<GankBean>(GankBean.class, url, mGankBeanNetworkListener);
+        NetworkManager.getInstance().sendRequest(request);
+    }
+
+## 4. ImageLoader的封装 ###
 ImageLoader是加载和缓存网络图片的工具。由于它也要用到RequestQueue, 一个应用也只需要一个ImageLoader,所以同样的封装到NetworkManager中。
 
     public void init(Context context) {
@@ -198,6 +198,16 @@ ImageLoader是加载和缓存网络图片的工具。由于它也要用到Reques
             put(url, bitmap);
         }
     }
+
+### NetworkImageView的使用 ###
+    mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
+    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);//设置默认图片
+    String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
+    mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+
+
+
+
 
 # Volley的封装层级 #
 Volley的封装级别类似Retrofit，[FunHttp](https://github.com/uncleleonfan/FunHttp)。 Retrofit，FunHttp都是对OKhttp的一层封装，解决了数据转换和线程切换等问题。
