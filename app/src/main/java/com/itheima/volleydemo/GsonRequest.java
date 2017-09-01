@@ -1,7 +1,5 @@
 package com.itheima.volleydemo;
 
-import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
@@ -9,8 +7,6 @@ import com.android.volley.toolbox.JsonRequest;
 import com.google.gson.Gson;
 
 import java.io.UnsupportedEncodingException;
-
-import static com.android.volley.VolleyLog.TAG;
 
 /**
  * Created by Leon on 2017/2/12.
@@ -26,6 +22,12 @@ public class GsonRequest<T> extends JsonRequest<T> {
         super(method, url, requestBody, listener, errorListener);
     }
 
+    /**
+     *  GET请求
+     * @param beanClass 网络解析的Java Bean类的Class对象
+     * @param url 网络地址
+     * @param listener 成功和失败的回调
+     */
     public GsonRequest(Class<T> beanClass, String url, NetworkListener<T> listener) {
         this(Method.GET, url, null, listener, listener);
         mClass = beanClass;
@@ -38,12 +40,14 @@ public class GsonRequest<T> extends JsonRequest<T> {
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         String parsedString;
         try {
-            parsedString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+            //将网络响应的字节数组转换成字符串
+            parsedString = new String(response.data, PROTOCOL_CHARSET);
         } catch (UnsupportedEncodingException e) {
             parsedString = new String(response.data);
         }
-        Log.d(TAG, "parsedString: " + parsedString);
+        //将字符串转换成java bean
         T result = mGson.fromJson(parsedString, mClass);
+        //返回解析后的结果，使用Response对象包装
         return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
     }
 }

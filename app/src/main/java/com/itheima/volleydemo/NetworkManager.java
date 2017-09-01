@@ -53,7 +53,8 @@ public class NetworkManager {
      */
     private static class ImageLruCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache{
 
-
+        //如果没有覆写sizeOf，maxSize表示能够保持的Bitmap的个数，
+        // 如果覆写了sizeOf, maxSize表示缓存的字节数大写
         public ImageLruCache(int maxSize) {
             super(maxSize);
         }

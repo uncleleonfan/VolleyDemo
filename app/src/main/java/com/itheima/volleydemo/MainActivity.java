@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
     public void onStartGsonRequest(View view) {
         String url = "http://gank.io/api/data/Android/10/1";
         GsonRequest<GankBean> request = new GsonRequest<GankBean>(GankBean.class, url, mGankBeanNetworkListener);
-//        Volley.newRequestQueue(MainActivity.this).add(request);
         NetworkManager.getInstance().sendRequest(request);
     }
 

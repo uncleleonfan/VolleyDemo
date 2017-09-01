@@ -208,6 +208,8 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
         NetworkManager.getInstance().sendRequest(request);
     }
 
+
+
 ## 4. ImageLoader的封装 ###
 ImageLoader是加载和缓存网络图片的工具。由于它也要用到RequestQueue, 一个应用也只需要一个ImageLoader,所以同样的封装到NetworkManager中。
 
