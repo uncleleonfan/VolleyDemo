@@ -130,9 +130,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStartImageRequest(View view) {
         String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
-        //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，则会对图片进行压缩，
-        // 指定成0的话就表示不管图片有多大，都不会进行压缩。
-        ImageRequest request = new ImageRequest(url, mBitmapListener, 0, 0, Bitmap.Config.RGB_565, mErrorListener);
+        //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，
+        //则会对图片进行压缩，指定成0的话就表示不管图片有多大，都不会进行压缩。
+        ImageRequest request = new ImageRequest(url,
+                mBitmapListener,
+                0,
+                0,
+                Bitmap.Config.RGB_565,
+                mErrorListener);
         Volley.newRequestQueue(this).add(request);
     }
 

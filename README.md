@@ -57,13 +57,18 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 
 ## 6. 图片请求 ##
     public void onStartImageRequest(View view) {
-        String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
-        //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，则会对图片进行压缩，
-        // 指定成0的话就表示不管图片有多大，都不会进行压缩。第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片
-        // 的宽度或高度大于这里的最大值，则会对图片进行压缩，指定成0的话就表示不管图片有多大，都不会进行压缩。
-        ImageRequest request = new ImageRequest(url, mBitmapListener, 0, 0, Bitmap.Config.RGB_565, mErrorListener);
+        String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
+        //第三第四个参数分别用于指定允许图片最大的宽度和高度，如果指定的网络图片的宽度或高度大于这里的最大值，
+        //则会对图片进行压缩，指定成0的话就表示不管图片有多大，都不会进行压缩。
+        ImageRequest request = new ImageRequest(url,
+                mBitmapListener,
+                0,
+                0,
+                Bitmap.Config.RGB_565,
+                mErrorListener);
         Volley.newRequestQueue(this).add(request);
     }
+
 
 # Volley的封装 #
 
@@ -201,9 +206,9 @@ ImageLoader是加载和缓存网络图片的工具。由于它也要用到Reques
 
 ### NetworkImageView的使用 ###
     mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
-    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);//设置默认图片
-    String url  = "http://10.0.2.2:8080/GooglePlayServer/image?name=image/home01.jpg";
-    mNetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);
+    String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
+    NetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
 
 
 
