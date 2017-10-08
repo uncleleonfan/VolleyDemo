@@ -194,7 +194,7 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 ### 返回解析后的结果 ###
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
-;
+
         //返回解析后的结果，使用Response对象包装
         return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
     }
