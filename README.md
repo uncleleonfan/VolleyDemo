@@ -170,36 +170,34 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
 	
 	public class GsonRequest<T> extends JsonRequest<T> {
 	    
-	    private Gson mGson = new Gson();
-	
-	    private Class<T> mClass;//要解析的类的类对象
-	    
 	    public GsonRequest(int method, String url, String requestBody, Response.Listener<T> listener, Response.ErrorListener errorListener) {
 	        super(method, url, requestBody, listener, errorListener);
 	    }
-	
-	    public GsonRequest(Class<T> beanClass, String url, NetworkListener<T> listener) {
-	        this(Method.GET, url, null, listener, listener);
-	        mClass = beanClass;
-	    }
-	
-	    /**
-	     * 将网络请求的结果用Gson解析成期望的类型，在子线程中调用
-	     */
-	    @Override
-	    protected Response<T> parseNetworkResponse(NetworkResponse response) {
-	        String parsedString;
-	        try {
-	            parsedString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-	        } catch (UnsupportedEncodingException e) {
-	            parsedString = new String(response.data);
-	        }
-	        Log.d(TAG, "parsedString: " + parsedString);
-	        T result = mGson.fromJson(parsedString, mClass);
-	        return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
-	    }
 	}
 
+### 将网络请求结果转换成字符串 ###
+    @Override
+    protected Response<T> parseNetworkResponse(NetworkResponse response) {
+        String parsedString;
+        try {
+            //将网络响应的字节数组转换成字符串
+            parsedString = new String(response.data, PROTOCOL_CHARSET);
+        } catch (UnsupportedEncodingException e) {
+        }
+
+    }
+
+### 将字符串转换成JavaBean ###
+    //将字符串转换成java bean
+    T result = mGson.fromJson(parsedString, mClass);
+
+### 返回解析后的结果 ###
+    @Override
+    protected Response<T> parseNetworkResponse(NetworkResponse response) {
+;
+        //返回解析后的结果，使用Response对象包装
+        return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
+    }
 
 ### 发送请求 ###
     public void onStartGsonRequest(View view) {
@@ -209,8 +207,16 @@ Volley 是 Goole I/O 2013上发布的网络通信库，使网络通信更快、�
     }
 
 
-
 ## 4. ImageLoader的封装 ###
+### NetworkImageView的使用 ###
+    mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
+    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);
+    String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
+    NetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+
+### ImageLoader的创建 ###
+
+
 ImageLoader是加载和缓存网络图片的工具。由于它也要用到RequestQueue, 一个应用也只需要一个ImageLoader,所以同样的封装到NetworkManager中。
 
     public void init(Context context) {
@@ -218,6 +224,8 @@ ImageLoader是加载和缓存网络图片的工具。由于它也要用到Reques
         mImageLoader = new ImageLoader(mQueue, new ImageLruCache(DEFAULT_IMAGE_CACHE_SIZE));
     }
 
+#### LRU原理 ####
+Least Recent Used。当访问一条数据时，数据会放在表头，当缓存超过最大值时，会删除表尾的数据。
 
     /**
      * 图片内存LRU缓存
@@ -254,11 +262,7 @@ ImageLoader是加载和缓存网络图片的工具。由于它也要用到Reques
         }
     }
 
-### NetworkImageView的使用 ###
-    mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
-    mNetworkImageView.setDefaultImageResId(R.mipmap.ic_launcher);
-    String url  = "https://ws1.sinaimg.cn/large/610dc034ly1fj3w0emfcbj20u011iabm.jpg";
-    NetworkImageView.setImageUrl(url, NetworkManager.getInstance().getImageLoader());
+
 
 
 
